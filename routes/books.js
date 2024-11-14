@@ -12,10 +12,10 @@ import notFoundErrorHandler from '../middleware/notFoundErrorHandler.js';
 //create router instance
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
       const { genre, available } = req.query
-      const books = getBooks(genre, available)
+      const books = await getBooks(genre, available)
       res.status(200).json(books)
     } catch (error) {
       console.error(error)
@@ -23,15 +23,19 @@ router.get('/', (req, res) => {
     }
   })
 
-router.get('/:id', (req, res) => {
-    // try {
+  // for prisma added async, await, try catch error, next(error)
+router.get('/:id', async (req, res, next) => {
+    try {
       const { id } = req.params // we extract the ID from the URL. This uses JavaScript's object destructuring feature. 
-      const book = getBookById(id)
+      const book = await getBookById(id)
   
       // if (!book) { // we check if our book was found or not
       //   res.status(404).send(`Book with id ${id} was not found!`)
       // } else {
         res.status(200).json(book)
+      } catch (error) {
+        next(error) // Express Error Handling mechanism does not catch the errors coming from asynchronous code by default
+      }
       }, notFoundErrorHandler);
     // } catch (error) {
     //   console.error(error)
@@ -39,10 +43,11 @@ router.get('/:id', (req, res) => {
     // }
 // })
 
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
       const { title, author, isbn, pages, available, genre } = req.body // request body
-      const newBook = createBook(title, author, isbn, pages, available, genre)
+      console.log("req.body:", req.body)
+      const newBook = await createBook(title, author, isbn, pages, available, genre)
       res.status(201).json(newBook) // 201 status code: (successfully) created
       
     } catch (error) {

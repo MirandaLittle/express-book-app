@@ -1,7 +1,8 @@
 import express from 'express'
 import booksRouter from './routes/books.js' //.js extension needed
 import recordsRouter from './routes/records.js'
-import loginRouter from './routes/login.js';
+import loginRouter from './routes/login.js'
+import userRouter from './routes/users.js'
 import log from './middleware/logMiddleware.js'
 import 'dotenv/config';
 import * as Sentry from '@sentry/node';
@@ -38,7 +39,8 @@ app.use(express.json()); // middleware helper, we're going to be sending you inf
 app.use(log)
 app.use('/books', booksRouter)
 app.use('/records', recordsRouter)
-app.use('/login', loginRouter);
+app.use('/login', loginRouter)
+app.use('/users', userRouter)
 
 
 app.get('/', (req, res) => { //create a root route sends back a message when someone visits the homepage of our app
